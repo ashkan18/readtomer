@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native'
+import { StyleSheet, Text, View, TextInput, Button, AsyncStorage } from 'react-native'
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
@@ -64,11 +64,11 @@ export default class LoginScreen extends React.Component {
     })
     .then((responseJson) => {
       console.log(responseJson)
-      this.props.navigation.navigate('Map', {
-        token: responseJson.data.token
-      })
+      AsyncStorage.setItem('userToken', 'responseJson.data.token')
+      this.props.navigation.navigate('App')
     })
     .catch((error) => {
+      console.error(error)
       this.setState({error: "Username and Password don't match. Please try again."})
     })
   }
