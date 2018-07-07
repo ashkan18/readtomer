@@ -1,5 +1,7 @@
-import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button, AsyncStorage } from 'react-native'
+import React from 'react'
+import { Button, FormLabel, FormInput, FormValidationMessage } from 'react-native-elements'
+import { StyleSheet, Text, View, TextInput, AsyncStorage } from 'react-native'
+import { bold } from 'ansi-colors';
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
@@ -12,13 +14,13 @@ export default class LoginScreen extends React.Component {
     title: "Login"
   }
   render() {
-      return (
+    const { navigate } = this.props.navigation
+    return (
       <View style={styles.container}>
-        <Text style={styles.error}>
-          {this.state.error}
-        </Text>
-        <TextInput
-          style={styles.input}
+        { this.state.error && <FormValidationMessage> {this.state.error} </FormValidationMessage> }
+        <FormLabel> Username </FormLabel>
+        <FormInput
+          style={styles.base}
           textContentType="username"
           keyboardType="email-address"
           placeholder="Username"
@@ -27,9 +29,10 @@ export default class LoginScreen extends React.Component {
           autoCorrect={false}
           onChangeText={(username) => this.setState({username})}
         />
-        <TextInput
+        <FormLabel> Password </FormLabel>
+        <FormInput
           secureTextEntry={true}
-          style={styles.input}
+          style={styles.base}
           textContentType="password"
           returnKeyType={'done'}
           autoCapitalize={'none'}
@@ -38,6 +41,12 @@ export default class LoginScreen extends React.Component {
           onChangeText={(password) => this.setState({password})}
         />
         <Button title="Login!" onPress={this.login}/>
+        <View style={styles.base}>
+          <Text>
+              Don't have an account? 
+              <Text style={styles.link} onPress={ () => navigate('Signup')}> Signup </Text>
+          </Text>
+        </View>
       </View>
     )
   }
@@ -81,9 +90,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  input: {
-    height: 60,
-    width: 100
+  base: {
+    marginTop: 20,
+    marginBottom: 10
+  },
+  link: {
+    fontWeight: 'bold'
   },
   error:{
     height: 60,

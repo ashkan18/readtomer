@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, Platform } from 'react-native'
+import { StyleSheet, TextInput, View, Platform } from 'react-native'
 import { MapView, Constants, Location, Permissions } from 'expo'
 import BookMapMarker from '../components/book_map_marker'
 
@@ -64,15 +64,15 @@ export default class MapScreen extends React.Component {
 
   render() {
    return (
-      <MapView
-        style={{ flex: 1 }}
-        region={this.state.region}
-        showsMyLocationButton
-        showsUserLocation
-        loadingEnabled={this.state.locating || this.state.searching}>
-        { this.state.books.map( (b) => <BookMapMarker book={b} key={b.id} />) }
+    <MapView
+      style={styles.map}
+      region={this.state.region}
+      showsMyLocationButton
+      showsUserLocation
+      loadingEnabled={this.state.locating || this.state.searching}>
+      { this.state.books.map( (b) => <BookMapMarker book={b} key={b.id} />) }
 
-      </MapView>
+    </MapView>
     )
   }
 }
