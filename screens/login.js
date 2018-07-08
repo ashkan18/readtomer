@@ -67,7 +67,7 @@ export default class LoginScreen extends React.Component {
     })
     .then((response) => {
       if (!response.ok) {
-        throw Error(response.statusText)
+        throw Error("Unknown username or password.")
       }
       return response.json()
     })
