@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, TextInput, View, Platform } from 'react-native'
+import { StyleSheet, Button, View, Platform } from 'react-native'
 import { MapView, Constants, Location, Permissions } from 'expo'
 import BookMapMarker from '../components/book_map_marker'
 
@@ -8,11 +8,20 @@ export default class MapScreen extends React.Component {
     super(props)
     this.state = { locating: true, region: null, errorMessages: null, currentLocation: null, books: [], searching: false}
   }
-  static navigationOptions = {
-    title: "Readtome"
+
+  static navigationOptions = ({ navigation }) => {
+    return({
+      title: "Readtome",
+      headerRight: (
+        navigation.getParam("postBook") && <Button
+          onPress={ navigation.getParam("postBook") }
+          title="📷"/>
+      )
+    })
   }
 
   componentDidMount(){
+    this.props.navigation.setParams({ postBook: this._postBook })
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.setState({
         errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
@@ -23,7 +32,7 @@ export default class MapScreen extends React.Component {
   }
 
   _getLocationAsync = async () => {
-    let { status } = await Permissions.askAsync(Permissions.LOCATION);
+    let { status } = await Permissions.askAsync(Permissions.LOCATION)
     if (status !== 'granted') {
       this.setState({
         errorMessage: 'Permission to access location was denied',
@@ -60,6 +69,10 @@ export default class MapScreen extends React.Component {
           this.setState({ searching: true, error})
         }
       )
+  }
+
+  _postBook = () => {
+    alert("hi")
   }
 
   render() {

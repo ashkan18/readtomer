@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, Button, AsyncStorage } from 'react-native'
+import { StyleSheet, Text, View, TextInput, Button, AsyncStorage, KeyboardAvoidingView } from 'react-native'
 
 export default class SignupScreen extends React.Component {
   constructor(props) {
@@ -22,7 +22,7 @@ export default class SignupScreen extends React.Component {
   render() {
     const { navigate } = this.props.navigation;
     return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView style={styles.container}>
         <Text style={styles.error}>
           {this.state.error}
         </Text>
@@ -80,7 +80,7 @@ export default class SignupScreen extends React.Component {
           <Text> Already have an account? </Text>
           <Button title="Login!" onPress={ () => navigate('Login')} />
         </View>
-      </View>
+      </KeyboardAvoidingView>
     )
   }
 

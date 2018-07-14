@@ -1,7 +1,7 @@
 import React from 'react'
 import { Button, FormLabel, FormInput, FormValidationMessage } from 'react-native-elements'
-import { StyleSheet, Text, View, TextInput, AsyncStorage } from 'react-native'
-import { bold } from 'ansi-colors';
+import { StyleSheet, Text, View, AsyncStorage ,KeyboardAvoidingView } from 'react-native'
+import axios, { AxiosRequestConfig, AxiosPromise } from 'axios'
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
@@ -16,7 +16,7 @@ export default class LoginScreen extends React.Component {
   render() {
     const { navigate } = this.props.navigation
     return (
-      <View style={styles.container}>
+      <KeyboardAvoidingView style={styles.container}>
         { this.state.error && <FormValidationMessage> {this.state.error} </FormValidationMessage> }
         <FormLabel> Username </FormLabel>
         <FormInput
@@ -43,41 +43,22 @@ export default class LoginScreen extends React.Component {
         <Button title="Login!" onPress={this.login}/>
         <View style={styles.base}>
           <Text>
-              Don't have an account? 
+              Don't have an account?
               <Text style={styles.link} onPress={ () => navigate('Signup')}> Signup </Text>
           </Text>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     )
   }
 
   login(_event){
-    fetch('http://localhost:4000/api/login', {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        user:{
-          username: this.state.username,
-          password: this.state.password
-        }
-      }),
-    })
-    .then((response) => {
-      if (!response.ok) {
-        throw Error("Unknown username or password.")
-      }
-      return response.json()
-    })
-    .then((responseJson) => {
-      console.log(responseJson)
-      AsyncStorage.setItem('userToken', 'responseJson.data.token')
+    axios.post("http://localhost:4000/api/login", { user: { username: this.state.username, password: this.state.password } })
+    .then( response => {
+      console.log(response.data.data.token)
+      AsyncStorage.setItem('userToken', response.data.data.token)
       this.props.navigation.navigate('App')
-    })
-    .catch((error) => {
-      console.error(error)
+    }).catch( _error => {
+      console.log(_error)
       this.setState({error: "Username and Password don't match. Please try again."})
     })
   }
