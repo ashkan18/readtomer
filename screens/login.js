@@ -52,9 +52,8 @@ export default class LoginScreen extends React.Component {
   }
 
   login(_event){
-    axios.post("http://localhost:4000/api/login", { user: { username: this.state.username, password: this.state.password } })
+    axios.post("http://192.168.1.5:4000/api/login", { user: { username: this.state.username, password: this.state.password } })
     .then( response => {
-      console.log(response.data.data.token)
       AsyncStorage.setItem('userToken', response.data.data.token)
       this.props.navigation.navigate('App')
     }).catch( _error => {

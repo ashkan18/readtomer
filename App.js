@@ -6,11 +6,13 @@ import AuthLoadingScreen from './screens/auth_loading'
 import LoginScreen from "./screens/login"
 import SignupScreen from "./screens/signup"
 import MapScreen from "./screens/map"
+import BarcodeReader from "./screens/barcode_reader"
 
 
 const AppStack = createStackNavigator(
   {
-    Map:  MapScreen
+    Map:  MapScreen,
+    BarcodeReader: BarcodeReader
   },
   {
     initialRouteName: "Map"

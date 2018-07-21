@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, Button, View, Platform } from 'react-native'
+import { StyleSheet, Button, Platform } from 'react-native'
 import { MapView, Constants, Location, Permissions } from 'expo'
+import axios, { AxiosRequestConfig, AxiosPromise } from 'axios'
 import BookMapMarker from '../components/book_map_marker'
 
 export default class MapScreen extends React.Component {
@@ -58,21 +59,18 @@ export default class MapScreen extends React.Component {
 
   _fetchBooks = (location) => {
     this.setState({searching: true})
-    fetch(`http://localhost:4000/api/book_instances?lat=${location.coords.latitude}&lng=${location.coords.longitude}&term=${"champions"}`)
-      .then( res => res.json() )
-      .then(
-        (result) => {
-          this.setState({searching: false, books: result.data})
-        },
-        (error) => {
-          console.error(error)
-          this.setState({ searching: true, error})
-        }
-      )
+    axios.get(`http://192.168.1.5:4000/api/book_instances?lat=${location.coords.latitude}&lng=${location.coords.longitude}&term=champions`)
+    .then( response => {
+      this.setState({searching: false, books: response.data.data})
+      this.props.navigation.navigate('App')
+    }).catch( _error => {
+      console.log(_error)
+      this.setState({ searching: false, _error})
+    })
   }
 
   _postBook = () => {
-    alert("hi")
+    this.props.navigation.navigate('BarcodeReader')
   }
 
   render() {
