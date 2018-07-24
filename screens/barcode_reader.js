@@ -3,13 +3,14 @@ import React from 'react'
 import { Camera, Permissions } from 'expo'
 import axios, { AxiosRequestConfig, AxiosPromise } from 'axios'
 import { Text, View } from 'react-native'
-import BookForm  from "../components/book_form"
+import ExternalBookForm  from "../components/external_book_form"
 
 export default class BarcodeReader extends React.Component {
   state = {
     hasCameraPermission: null,
     type: Camera.Constants.Type.back,
     showCamera: false,
+    scannedBarcode: null,
     bookData: null,
     error: null
   };
@@ -26,12 +27,12 @@ export default class BarcodeReader extends React.Component {
     } else if (hasCameraPermission === false) {
       return <Text>No access to camera</Text>
     } else if (bookData !== null) {
-      console.log(bookData)
-      return <BookForm
-        title={bookData.title}
-        authors={bookData.authors}
-        description={bookData.description}
-        isbn={bookData.isbn}/>
+      return <ExternalBookForm
+        title={bookData.data.title}
+        authors={bookData.data.authors}
+        description={bookData.data.description}
+        coverUrl={bookData.data.cover_url}
+        isbn={bookData.data.isbn}/>
     } else {
       return (
         <View style={{ flex: 1 }}>
@@ -50,14 +51,19 @@ export default class BarcodeReader extends React.Component {
   }
 
   barcodeRead = ({data}) => {
-    this.setState({showCamera: true})
-    axios.get(`http://192.168.1.5:4000/api/find_in_the_wild?isbn=${data}`)
-    .then( response => {
-      this.setState({ bookData: response.data})
-    }).catch( _error => {
-      console.log(_error)
-      this.setState({error})
-    })
+    if (this.state.scannedBarcode === null) {
+      this.setState({showCamera: true})
+      axios.get(`http://192.168.1.5:4000/api/find_in_the_wild?isbn=${data}`)
+      .then( response => {
+        if (response.data.external !== true) {
+          this.props.navigation.navigate('BookInstanceForm', { book: response.data.data })
+        } else {
+          this.setState({ bookData: response.data.data})
+        }
+      }).catch( _error => {
+        console.log(_error)
+        this.setState({_error})
+      })
+    }
   }
-
 }

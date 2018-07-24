@@ -1,17 +1,16 @@
 import React from 'react'
-import { Text, View, Button, StyleSheet } from 'react-native'
+import { Text, View, Button, StyleSheet, Image } from 'react-native'
 
-export default class BookForm extends React.Component {
+export default class BookInstanceForm extends React.Component {
   constructor(props) {
     super(props)
+    this.state = { book: this.props.navigation.getParam('book') }
   }
 
   render() {
     return (
       <View>
-        <Text> {this.props.title} </Text>
-        <Text> {this.props.isbn} </Text>
-        <Text> {this.props.description} </Text>
+        <Text> {this.state.book.title} </Text>
         <Button title="Submit!" onPress={this.submit}/>
       </View>
     )
@@ -29,7 +28,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  map: {
-    flex: 1
+  cover: {
+    width: 200,
+    height: 200
   }
 })
