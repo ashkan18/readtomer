@@ -11,7 +11,7 @@ export default class BarcodeReader extends React.Component {
     type: Camera.Constants.Type.back,
     showCamera: false,
     scannedBarcode: null,
-    bookData: null,
+    foundedBook: null,
     error: null
   };
 
@@ -21,18 +21,11 @@ export default class BarcodeReader extends React.Component {
   }
 
   render() {
-    const { hasCameraPermission, showCamera, bookData } = this.state;
+    const { hasCameraPermission, showCamera, foundedBook } = this.state;
     if (hasCameraPermission === null) {
       return <View />
     } else if (hasCameraPermission === false) {
       return <Text>No access to camera</Text>
-    } else if (bookData !== null) {
-      return <ExternalBookForm
-        title={bookData.data.title}
-        authors={bookData.data.authors}
-        description={bookData.data.description}
-        coverUrl={bookData.data.cover_url}
-        isbn={bookData.data.isbn}/>
     } else {
       return (
         <View style={{ flex: 1 }}>
@@ -53,13 +46,9 @@ export default class BarcodeReader extends React.Component {
   barcodeRead = ({data}) => {
     if (this.state.scannedBarcode === null) {
       this.setState({showCamera: true})
-      axios.get(`http://192.168.1.5:4000/api/find_in_the_wild?isbn=${data}`)
+      axios.get(`http://192.168.1.3:4000/api/find_in_the_wild?isbn=${data}`)
       .then( response => {
-        if (response.data.external !== true) {
-          this.props.navigation.navigate('BookInstanceForm', { book: response.data.data })
-        } else {
-          this.setState({ bookData: response.data.data})
-        }
+        this.props.navigation.navigate('BookInstanceForm', { book: response.data.book, external: response.data.external })
       }).catch( _error => {
         console.log(_error)
         this.setState({_error})

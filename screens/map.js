@@ -41,7 +41,6 @@ export default class MapScreen extends React.Component {
     }
 
     let currentLocation = await Location.getCurrentPositionAsync({})
-    console.log(currentLocation)
     this.setState({ currentLocation, locating: false, region: this._regionFromLocation(currentLocation) })
     this._fetchBooks(currentLocation)
   }
@@ -59,7 +58,7 @@ export default class MapScreen extends React.Component {
 
   _fetchBooks = (location) => {
     this.setState({searching: true})
-    axios.get(`http://192.168.1.5:4000/api/book_instances?lat=${location.coords.latitude}&lng=${location.coords.longitude}&term=champions`)
+    axios.get(`http://192.168.1.3:4000/api/book_instances?lat=${location.coords.latitude}&lng=${location.coords.longitude}&term=champions`)
     .then( response => {
       this.setState({searching: false, books: response.data.data})
       this.props.navigation.navigate('App')
