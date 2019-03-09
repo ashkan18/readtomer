@@ -7,8 +7,13 @@ import {
   View,
 } from 'react-native'
 
-export default class AuthLoadingScreen extends React.Component {
-  constructor(props) {
+
+interface Props {
+  navigation: any
+}
+
+export default class AuthLoadingScreen extends React.Component<Props,{}> {
+  constructor(props: Props) {
     super(props)
     this._bootstrapAsync()
   }

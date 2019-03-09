@@ -1,14 +1,27 @@
 import React from 'react';
 import { StyleSheet, Button, Platform } from 'react-native'
 import { MapView, Constants, Location, Permissions } from 'expo'
-import axios, { AxiosRequestConfig, AxiosPromise } from 'axios'
 import BookMapMarker from '../components/book_map_marker'
-import AuthService from '../services/auth_service';
+import BookService from '../services/book_service'
 
-export default class MapScreen extends React.Component {
-  constructor(props) {
+interface Props {
+  navigation: any
+}
+
+interface State {
+  locating: boolean
+  region: any
+  error?: string
+  currentLocation: any
+  bookInstances: Array<BookInstance>
+  searching: boolean
+}
+
+
+export default class MapScreen extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props)
-    this.state = { locating: true, region: null, errorMessages: null, currentLocation: null, books: [], searching: false}
+    this.state = { locating: true, region: null, currentLocation: null, bookInstances: [], searching: false}
   }
 
   static navigationOptions = ({ navigation }) => {
@@ -26,7 +39,7 @@ export default class MapScreen extends React.Component {
     this.props.navigation.setParams({ postBook: this._postBook })
     if (Platform.OS === 'android' && !Constants.isDevice) {
       this.setState({
-        errorMessage: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
+        error: 'Oops, this will not work on Sketch in an Android emulator. Try it on your device!',
       });
     } else {
       this._getLocationAsync();
@@ -37,16 +50,16 @@ export default class MapScreen extends React.Component {
     let { status } = await Permissions.askAsync(Permissions.LOCATION)
     if (status !== 'granted') {
       this.setState({
-        errorMessage: 'Permission to access location was denied',
+        error: 'Permission to access location was denied',
       });
     }
 
-    let currentLocation = await Location.getCurrentPositionAsync({})
+    let currentLocation = await Location.getCurrentPositionAsync({accuracy: 25})
     this.setState({ currentLocation, locating: false, region: this._regionFromLocation(currentLocation) })
     this._fetchBooks(currentLocation)
   }
 
-  _regionFromLocation = (location) => {
+  _regionFromLocation = (location: any) => {
     return (
       {
         latitude: location.coords.latitude,
@@ -57,45 +70,16 @@ export default class MapScreen extends React.Component {
     )
   }
 
-  _fetchBooks = (location) => {
-    let authService = new AuthService
+  _fetchBooks = (location: any) => {
+    let bookService = new BookService
     this.setState({searching: true})
-    axios({
-      url: "https://readtome.herokuapp.com/api/",
-      method: "post",
-      data: {
-        query: `
-          query bookInstances($lat: Float, $lng: Float, $term: String, $offerings: [String] ) {
-            bookInstances(lat: $lat, lng: $lng, term: $term, offerings: $offerings) {
-              id
-              reader {
-                id
-                name
-                photos
-              }
-              book {
-                id
-                title
-                authors {
-                  name
-                  id
-                  bio
-                }
-              }
-              location
-            }
-          }
-        `,
-        variables: {term: "champions", lat: location.coords.latitude, lng: location.coords.longitude }
-      },
-      headers: { 'Authorization': `Bearer ${authService.getToken()}`} }
-    )
-    .then( response => {
-      this.setState({searching: false, books: response.data.data.bookInstances})
+    bookService.fetchBooks(location.coords.latitude, location.coords.longitude, "champions")
+    .then( (bookInstances: Array<BookInstance>) => {
+      this.setState({searching: false, bookInstances})
       this.props.navigation.navigate('App')
-    }).catch( _error => {
-      console.log(_error)
-      this.setState({ searching: false, _error})
+    }).catch( error => {
+      console.log(error)
+      this.setState({ searching: false, error})
     })
   }
 
@@ -111,7 +95,7 @@ export default class MapScreen extends React.Component {
       showsMyLocationButton
       showsUserLocation
       loadingEnabled={this.state.locating || this.state.searching}>
-      { this.state.books.map( (b) => <BookMapMarker book={b} key={b.id} />) }
+      { this.state.bookInstances.map( (b) => <BookMapMarker bookInstance={b} key={b.id} />) }
 
     </MapView>
     )

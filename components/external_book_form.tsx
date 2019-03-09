@@ -1,27 +1,31 @@
 import React from 'react'
 import { Text, View, Button, StyleSheet, Image } from 'react-native'
 
-export default class ExternalBookForm extends React.Component {
-  constructor(props) {
+interface Props {
+  book: Book
+}
+
+export default class ExternalBookForm extends React.Component<Props, {}> {
+  constructor(props: Props) {
     super(props)
   }
 
   render() {
     return (
       <View>
-        <Text> {this.props.title} </Text>
-        <Text> {this.props.isbn} </Text>
-        <Text> {this.props.coverUrl} </Text>
+        <Text> {this.props.book.title} </Text>
+        <Text> {this.props.book.isbn} </Text>
+        <Text> {this.props.book.coverUrl} </Text>
         <Image
           style={styles.cover}
-          source={{uri: this.props.coverUrl}}/>
-        <Text> {this.props.description} </Text>
+          source={{uri: this.props.book.coverUrl}}/>
+        <Text> {this.props.book.description} </Text>
         <Button title="Submit!" onPress={this.submit}/>
       </View>
     )
   }
 
-  submit(_event) {
+  submit() {
 
   }
 }

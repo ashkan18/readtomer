@@ -48,4 +48,45 @@ export default class BookService {
       .catch(error => rejected(error))
     )
   }
+
+  public fetchBooks(lat: number, lng: number, term: string): Promise<Array<BookInstance>>{
+    return new Promise((resolve, rejected) =>
+      this.authService.getToken()
+      .then( token => {
+        axios({
+          url: "https://readtome.herokuapp.com/api/",
+          method: "post",
+          data: {
+            query: `
+              query bookInstances($lat: Float, $lng: Float, $term: String, $offerings: [String] ) {
+                bookInstances(lat: $lat, lng: $lng, term: $term, offerings: $offerings) {
+                  id
+                  reader {
+                    id
+                    name
+                    photos
+                  }
+                  book {
+                    id
+                    title
+                    authors {
+                      name
+                      id
+                      bio
+                    }
+                  }
+                  location
+                }
+              }
+            `,
+            variables: {term: term, lat: lat, lng: lng }
+          },
+          headers: { 'Authorization': `Bearer ${token}`} }
+        )
+        .then( response => resolve(response.data.data.bookInstances))
+        .catch( error => rejected(error))
+      })
+      .catch(error => rejected(error))
+    )
+  }
 }

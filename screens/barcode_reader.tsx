@@ -2,7 +2,6 @@
 import React from 'react'
 import { Camera, Permissions } from 'expo'
 import { Text, View } from 'react-native'
-import ExternalBookForm  from "../components/external_book_form"
 import BookService from '../services/book_service';
 
 interface Props {
@@ -41,7 +40,7 @@ export default class BarcodeReader extends React.Component<Props, State> {
     } else {
       return (
         <View style={{ flex: 1 }}>
-          <Camera style={{ flex: 1 }} type={this.state.type} onBarCodeRead={ this.barcodeRead } >
+          <Camera style={{ flex: 1 }} type={this.state.type} onBarCodeScanned={ this.barcodeRead } >
             <View
               style={{
                 flex: 1,
