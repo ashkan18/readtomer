@@ -2,17 +2,27 @@ import React from 'react'
 import { View, StyleSheet, Image } from 'react-native'
 import { CheckBox, Divider, Button, Text } from 'react-native-elements'
 import { Location } from 'expo'
-import AuthService from '../services/auth_service'
-import axios, { AxiosRequestConfig, AxiosPromise } from 'axios'
+import BookService from '../services/book_service'
 
-export default class BookInstanceForm extends React.Component {
-  constructor(props) {
+interface Props {
+  navigation: any
+}
+
+interface State {
+  book: any
+  external: any
+  reading: boolean
+  loaning: boolean
+  takeIt: boolean
+  location: any
+  error?: string
+}
+
+export default class BookInstanceForm extends React.Component<Props, State>{
+  constructor(props: Props) {
     super(props)
+    this.submit = this.submit.bind(this)
     this.state = { book: this.props.navigation.getParam('book'), external: this.props.navigation.getParam('external'), reading: false, loaning: false, takeIt: false, location:  null}
-  }
-
-  componentDidMount(){
-    this._getLocationAsync()
   }
 
   render() {
@@ -30,24 +40,21 @@ export default class BookInstanceForm extends React.Component {
     )
   }
 
-  _getLocationAsync = async () => {
-    let currentLocation = await Location.getCurrentPositionAsync({})
-    this.setState({ location: currentLocation })
-  }
-
-  submit(_event) {
-    let authService = new AuthService
-    axios({
-      url: "https://readtome.herokuapp.com/api/book_instance",
-      method: "post",
-      data: { book_instance: { medium: 'test', offerings: 'reading',  condition: 'fair', location: this.state.location, book_id: this.state.book.id} },
-      headers: { 'Authorization': `Bearer ${authService.getToken()}`} }
-    )
-    .then( response => {
-      this.props.navigation.navigate('Map')
-    }).catch( _error => {
-      console.log(_error)
-      this.setState({error: "Username and Password don't match. Please try again."})
+  private submit() {
+    Location.getCurrentPositionAsync({accuracy: 25})
+    .then( (locationData: any) => {
+      let bookService = new BookService
+      bookService.submitBook(locationData.coords, this.state.book.id)
+      .then( _response => {
+        this.props.navigation.navigate('Map')
+      })
+      .catch( error => {
+        console.log(error)
+        this.setState({error})
+      })
+    }).catch( error => {
+      console.log(error)
+      this.setState({error})
     })
   }
 }

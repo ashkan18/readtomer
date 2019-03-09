@@ -7,7 +7,7 @@ export default class AuthService {
     this.login = this.login.bind(this)
   }
 
-  login(username, pass){
+  login(username: string, pass: string){
     return new Promise((resolve, rejected) =>
       axios.post("https://readtome.herokuapp.com/api/login", { user: { username: username, password: pass } })
       .then( response => {
@@ -20,23 +20,16 @@ export default class AuthService {
     )
   }
 
-  setToken = (idToken) => {
+  setToken = (token: string) => {
     // Saves user token to localStorage
-    AsyncStorage.setItem('userToken', idToken)
+    AsyncStorage.setItem('userToken', token)
   }
 
-  getToken() {
-    token = async () => {
-      try {
-        const value = await AsyncStorage.getItem('userToken');
-        if (value !== null) {
-          // We have data!!
-          console.log(value);
-        }
-      } catch (error) {
-        // Error retrieving data
-      }
-    }
-    return token
+  getToken(): Promise<String|null> {
+    return new Promise((resolve, rejected) =>
+      AsyncStorage.getItem('userToken')
+      .then( value => resolve(value))
+      .catch( error => rejected(error) )
+    )
   }
 }

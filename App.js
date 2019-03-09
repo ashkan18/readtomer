@@ -9,7 +9,6 @@ import MapScreen from "./screens/map"
 import BarcodeReader from "./screens/barcode_reader"
 import BookInstanceForm from "./screens/book_instance_form"
 
-
 const AppStack = createStackNavigator(
   {
     Map:  MapScreen,

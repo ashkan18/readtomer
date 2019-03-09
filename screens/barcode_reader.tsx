@@ -1,21 +1,31 @@
 
 import React from 'react'
 import { Camera, Permissions } from 'expo'
-import axios, { AxiosRequestConfig, AxiosPromise } from 'axios'
 import { Text, View } from 'react-native'
 import ExternalBookForm  from "../components/external_book_form"
-import AuthService from '../services/auth_service'
-import { AsyncStorage } from 'react-native';
+import BookService from '../services/book_service';
 
-export default class BarcodeReader extends React.Component {
+interface Props {
+  navigation: any
+}
+interface State {
+  hasCameraPermission: boolean,
+  type: any,
+  showCamera: boolean,
+  scannedBarcode: string | null,
+  foundedBook: any,
+  error?: string
+}
+
+export default class BarcodeReader extends React.Component<Props, State> {
   state = {
-    hasCameraPermission: null,
+    hasCameraPermission: false,
     type: Camera.Constants.Type.back,
     showCamera: false,
     scannedBarcode: null,
-    foundedBook: null,
-    error: null
+    foundedBook: null
   };
+  bookService: BookService = new BookService
 
   async componentWillMount() {
     const { status } = await Permissions.askAsync(Permissions.CAMERA);
@@ -45,21 +55,16 @@ export default class BarcodeReader extends React.Component {
     }
   }
 
-  barcodeRead = ({data}) => {
-    AsyncStorage.getItem("userToken").then((token) => {
-      console.log("=========>", token)
-      if (this.state.scannedBarcode === null) {
-        console.log("-------------------> 2", token)
-        this.setState({showCamera: true})
-        axios.get(`https://readtome.herokuapp.com/api/find_in_the_wild?isbn=${data}`,
-        { headers: { 'Authorization': `Bearer ${token}` }})
-        .then( response => {
-          this.props.navigation.navigate('BookInstanceForm', { book: response.data.book, external: response.data.external })
-        }).catch( _error => {
-          console.log(_error)
-          this.setState({_error})
-        })
-      }
-    })
+  barcodeRead = (scanned:any) => {
+    if (this.state.scannedBarcode === null) {
+      this.setState({showCamera: true})
+      this.bookService.findBook(scanned.data)
+      .then( response => {
+        this.props.navigation.navigate('BookInstanceForm', { book: response.book, external: response.external })
+      }).catch( error => {
+        console.log(error)
+        this.setState({error})
+      })
+    }
   }
 }
