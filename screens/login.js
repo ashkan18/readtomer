@@ -2,6 +2,7 @@ import React from 'react'
 import { Button, FormLabel, FormInput, FormValidationMessage } from 'react-native-elements'
 import { StyleSheet, Text, View, AsyncStorage ,KeyboardAvoidingView } from 'react-native'
 import axios, { AxiosRequestConfig, AxiosPromise } from 'axios'
+import AuthService from '../services/auth_service';
 
 export default class LoginScreen extends React.Component {
   constructor(props) {
@@ -52,11 +53,10 @@ export default class LoginScreen extends React.Component {
   }
 
   login(_event){
-    axios.post("http://192.168.1.3:4000/api/login", { user: { username: this.state.username, password: this.state.password } })
-    .then( response => {
-      AsyncStorage.setItem('userToken', response.data.data.token)
-      this.props.navigation.navigate('App')
-    }).catch( _error => {
+    let authService = new AuthService
+    authService.login(this.state.username, this.state.password)
+    .then( _response => this.props.navigation.navigate('App') )
+    .catch( _error => {
       console.log(_error)
       this.setState({error: "Username and Password don't match. Please try again."})
     })

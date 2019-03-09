@@ -3,6 +3,7 @@ import { StyleSheet, Button, Platform } from 'react-native'
 import { MapView, Constants, Location, Permissions } from 'expo'
 import axios, { AxiosRequestConfig, AxiosPromise } from 'axios'
 import BookMapMarker from '../components/book_map_marker'
+import AuthService from '../services/auth_service';
 
 export default class MapScreen extends React.Component {
   constructor(props) {
@@ -57,10 +58,40 @@ export default class MapScreen extends React.Component {
   }
 
   _fetchBooks = (location) => {
+    let authService = new AuthService
     this.setState({searching: true})
-    axios.get(`http://192.168.1.3:4000/api/book_instances?lat=${location.coords.latitude}&lng=${location.coords.longitude}&term=champions`)
+    axios({
+      url: "https://readtome.herokuapp.com/api/",
+      method: "post",
+      data: {
+        query: `
+          query bookInstances($lat: Float, $lng: Float, $term: String, $offerings: [String] ) {
+            bookInstances(lat: $lat, lng: $lng, term: $term, offerings: $offerings) {
+              id
+              reader {
+                id
+                name
+                photos
+              }
+              book {
+                id
+                title
+                authors {
+                  name
+                  id
+                  bio
+                }
+              }
+              location
+            }
+          }
+        `,
+        variables: {term: "champions", lat: location.coords.latitude, lng: location.coords.longitude }
+      },
+      headers: { 'Authorization': `Bearer ${authService.getToken()}`} }
+    )
     .then( response => {
-      this.setState({searching: false, books: response.data.data})
+      this.setState({searching: false, books: response.data.data.bookInstances})
       this.props.navigation.navigate('App')
     }).catch( _error => {
       console.log(_error)

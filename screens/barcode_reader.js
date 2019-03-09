@@ -4,6 +4,8 @@ import { Camera, Permissions } from 'expo'
 import axios, { AxiosRequestConfig, AxiosPromise } from 'axios'
 import { Text, View } from 'react-native'
 import ExternalBookForm  from "../components/external_book_form"
+import AuthService from '../services/auth_service'
+import { AsyncStorage } from 'react-native';
 
 export default class BarcodeReader extends React.Component {
   state = {
@@ -44,15 +46,20 @@ export default class BarcodeReader extends React.Component {
   }
 
   barcodeRead = ({data}) => {
-    if (this.state.scannedBarcode === null) {
-      this.setState({showCamera: true})
-      axios.get(`http://192.168.1.3:4000/api/find_in_the_wild?isbn=${data}`)
-      .then( response => {
-        this.props.navigation.navigate('BookInstanceForm', { book: response.data.book, external: response.data.external })
-      }).catch( _error => {
-        console.log(_error)
-        this.setState({_error})
-      })
-    }
+    AsyncStorage.getItem("userToken").then((token) => {
+      console.log("=========>", token)
+      if (this.state.scannedBarcode === null) {
+        console.log("-------------------> 2", token)
+        this.setState({showCamera: true})
+        axios.get(`https://readtome.herokuapp.com/api/find_in_the_wild?isbn=${data}`,
+        { headers: { 'Authorization': `Bearer ${token}` }})
+        .then( response => {
+          this.props.navigation.navigate('BookInstanceForm', { book: response.data.book, external: response.data.external })
+        }).catch( _error => {
+          console.log(_error)
+          this.setState({_error})
+        })
+      }
+    })
   }
 }

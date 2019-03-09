@@ -2,6 +2,8 @@ import React from 'react'
 import { View, StyleSheet, Image } from 'react-native'
 import { CheckBox, Divider, Button, Text } from 'react-native-elements'
 import { Location } from 'expo'
+import AuthService from '../services/auth_service'
+import axios, { AxiosRequestConfig, AxiosPromise } from 'axios'
 
 export default class BookInstanceForm extends React.Component {
   constructor(props) {
@@ -34,8 +36,13 @@ export default class BookInstanceForm extends React.Component {
   }
 
   submit(_event) {
-    let token = AsyncStorage.getItem('userToken')
-    axios.post("http://192.168.1.3:4000/api/book_instance", { book_instance: { medium: 'test', offerings: 'reading',  condition: 'fair', location: this.state.location, book_id: this.state.book.id}})
+    let authService = new AuthService
+    axios({
+      url: "https://readtome.herokuapp.com/api/book_instance",
+      method: "post",
+      data: { book_instance: { medium: 'test', offerings: 'reading',  condition: 'fair', location: this.state.location, book_id: this.state.book.id} },
+      headers: { 'Authorization': `Bearer ${authService.getToken()}`} }
+    )
     .then( response => {
       this.props.navigation.navigate('Map')
     }).catch( _error => {
