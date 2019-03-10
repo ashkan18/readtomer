@@ -1,8 +1,22 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput, Button, AsyncStorage, KeyboardAvoidingView } from 'react-native'
 
-export default class SignupScreen extends React.Component {
-  constructor(props) {
+interface Props {
+  navigation: any
+}
+
+interface State {
+  name: string
+  username: string
+  email: string
+  password: string
+  passwordConfirmation: string
+  sex: string
+  error?: string
+}
+
+export default class SignupScreen extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props)
     this.signup = this.signup.bind(this)
     this.state = {
@@ -47,7 +61,7 @@ export default class SignupScreen extends React.Component {
         />
         <TextInput
           style={styles.input}
-          textContentType="email"
+          textContentType="emailAddress"
           keyboardType="email-address"
           placeholder="Email"
           autoCapitalize={'none'}
@@ -84,7 +98,7 @@ export default class SignupScreen extends React.Component {
     )
   }
 
-  signup(_event) {
+  signup() {
     fetch('http://localhost:4000/api/signup', {
       method: 'POST',
       headers: {

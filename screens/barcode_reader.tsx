@@ -12,7 +12,6 @@ interface State {
   type: any,
   showCamera: boolean,
   scannedBarcode: string | null,
-  foundedBook: any,
   error?: string
 }
 
@@ -32,7 +31,7 @@ export default class BarcodeReader extends React.Component<Props, State> {
   }
 
   render() {
-    const { hasCameraPermission, showCamera, foundedBook } = this.state;
+    const { hasCameraPermission } = this.state;
     if (hasCameraPermission === null) {
       return <View />
     } else if (hasCameraPermission === false) {
