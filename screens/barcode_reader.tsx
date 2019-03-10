@@ -40,7 +40,7 @@ export default class BarcodeReader extends React.Component<Props, State> {
     } else {
       return (
         <View style={{ flex: 1 }}>
-          <Camera style={{ flex: 1 }} type={this.state.type} onBarCodeScanned={ this.barcodeRead } >
+          <Camera style={{ flex: 1 }} type={this.state.type} onBarCodeRead={this.barcodeRead} onBarCodeScanned={ this.barcodeRead } >
             <View
               style={{
                 flex: 1,

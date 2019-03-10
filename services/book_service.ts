@@ -37,9 +37,9 @@ export default class BookService {
       this.authService.getToken()
       .then( token => {
         axios({
-          url: "https://readtome.herokuapp.com/api/book_instance",
+          url: "https://readtome.herokuapp.com/api/book_instances",
           method: "post",
-          data: { book_instance: { medium: 'test', offerings: 'reading',  condition: 'fair', location: [coords.latitude, coords.longitude].join(','), book_id: bookId} },
+          data: { book_instance: { medium: 'test', offerings: 'reading',  condition: 'fair', lat: coords.latitude, lng: coords.longitude, book_id: bookId} },
           headers: { 'Authorization': `Bearer ${token}`} }
         )
         .then( response => resolve(response.data))
